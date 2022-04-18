@@ -1,0 +1,81 @@
+import csv
+import os
+import sys
+import time
+import random
+import pygame
+clock = pygame.time.Clock()
+def screen_clear():
+    # for mac and linux(here, os.name is 'posix')
+    if os.name == 'posix':
+        _ = os.system('clear')
+    else:
+        # for windows platform
+        _ = os.system('cls')
+
+
+def get_maze(file):
+    f = open(file, 'r')
+    reader = csv.reader(f)
+    maze = []
+    for line in reader:
+        maze.append(line)
+    return maze
+
+
+def draw_maze(maze_, path):
+    m2 = maze_[:]  # creates a copy
+    screen_clear()
+
+    for item in path:
+        m2[item[0]][item[1]] = '.'
+
+    m2[path[-1][0]][path[-1][1]] = 'M'
+    draw = ''
+
+    for row in m2:
+        for item in row:
+            item = str(item).replace('1', '█')
+            item = str(item).replace('2', ' ')
+            item = str(item).replace("0", " ")
+            draw += item
+        draw += '\n'
+    print(draw)
+
+
+def navigate(path):
+    time.sleep(0.3)
+    clock.tick(60)
+    cur = path[-1]
+    draw_maze(maze, path)
+    poss = [(cur[0], cur[1] + 1), (cur[0], cur[1] - 1), (cur[0] + 1, cur[1]), (cur[0] - 1, cur[1])]
+    random.shuffle(poss)
+
+    for item in poss:
+        # to keep in check so that algorithm doesn't go off the maze
+        if item[0] < 0 or item[1] < 0 or item[0] > len(maze) or item[1] > len(maze[0]):
+            continue
+        # to avoid colliding into walls
+        elif maze[item[0]][item[1]] in ['1', '2']:
+            continue
+        # to avoid retracing the path
+        elif item in path:
+            continue
+        # if user reaches end of the maze
+        elif maze[item[0]][item[1]] == 'B':
+            path = path + (item,)
+            draw_maze(maze, path)
+            input('Solution Found')
+            screen_clear()
+            sys.exit()
+        else:
+            new_path = path + (item,)
+            navigate(new_path)
+            maze[item[0]][item[1]] = '2'
+            draw_maze(maze, path)
+            time.sleep(0.3)
+
+
+maze = get_maze('maze.csv')
+navigate(((1, 0),))
+input('> ')
