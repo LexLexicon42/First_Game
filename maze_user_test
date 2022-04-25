@@ -1,0 +1,133 @@
+import csv
+import os
+import sys
+import time
+import random
+import pygame
+
+# Constants to be set
+SCREEN_WIDTH = 1000
+SCREEN_HEIGHT = 800
+wall_image = pygame.image.load('pygame2.jpg')
+square_image = pygame.image.load('white_square.jpg')
+empty_image = pygame.image.load('black_square.jpg')
+dot_image = pygame.image.load('dot.jpg')
+user_image = pygame.image.load('blue_square.jpg')
+clock = pygame.time.Clock()  # To set the frame rate
+SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+
+
+
+def navigate_user(path):
+    time.sleep(0.3)
+    clock.tick(120)
+    cur = path[-1]
+    create(maze, path)
+    poss = [(cur[0], cur[1] + 1), (cur[0], cur[1] - 1), (cur[0] + 1, cur[1]), (cur[0] - 1, cur[1])]
+    def move_right():
+        direction = (cur[0] + 1, cur[1])
+        new_path = path + (direction,)
+        navigate_user(new_path)
+        maze[item[0]][item[1]] = '2'
+        create(maze, path)
+        time.sleep(0.3)
+        pygame.display.update()
+
+    def move_left():
+        direction = (cur[0] - 1, cur[1])
+        new_path = path + (direction,)
+        navigate_user(new_path)
+        maze[item[0]][item[1]] = '2'
+        create(maze, path)
+        time.sleep(0.3)
+        pygame.display.update()
+
+    def move_up():
+        direction = (cur[0], cur[1] + 1)
+        new_path = path + (direction,)
+        navigate_user(new_path)
+        maze[item[0]][item[1]] = '2'
+        create(maze, path)
+        time.sleep(0.3)
+        pygame.display.update()
+
+    def move_down():
+        direction = (cur[0], cur[1] - 1)
+        new_path = path + (direction,)
+        navigate_user(new_path)
+        maze[item[0]][item[1]] = '2'
+        create(maze, path)
+        time.sleep(0.3)
+        pygame.display.update()
+    for item in poss:
+        if item[0] < 0 or item[1] < 0 or item[0] > len(maze) or item[1] > len(maze[0]):
+            continue
+        # to avoid colliding into walls
+        elif maze[item[0]][item[1]] in ['1', '2']:
+            continue
+        # to avoid retracing the path
+        elif item in path:
+            continue
+        elif maze[item[0]][item[1]] == 'B':
+            path = path + (item,)
+            create(maze, path)
+            input('Solution Found')
+            sys.exit()
+        else:
+            key = pygame.key.get_pressed()
+            if key[pygame.K_w]:
+                move_up()
+            if key[pygame.K_s]:
+                move_down()
+            if key[pygame.K_a]:
+                move_left()
+            if key[pygame.K_d]:
+                move_right()
+
+
+def create(_maze, path):
+    clock.tick(120)
+    SCREEN.fill((0, 0, 0))
+    m2 = _maze[:]  # creates a copy
+
+    for item in path:
+        m2[item[0]][item[1]] = '.'
+
+    m2[path[-1][0]][path[-1][1]] = 'M'
+
+    for y in range(len(_maze)):
+        row = _maze[y]
+        for x in range(len(row)):
+            item = row[x]
+            if item == '1':
+                SCREEN.blit(wall_image, (46 * x, 45 * y))
+            elif item == 'M':
+                SCREEN.blit(square_image, (46 * x, 45 * y))
+            elif item == '.':
+                SCREEN.blit(dot_image, ((46 * x) + 23, (45 * y) + 22))
+            elif item == '2':
+                SCREEN.blit(empty_image, (46 * x, 45 * y))
+    pygame.display.update()
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+
+
+def get_maze(file):
+    f = open(file, 'r')
+    reader = csv.reader(f)
+    maze = []
+    for line in reader:
+        maze.append(line)
+    return maze
+
+maze = get_maze('maze.csv')
+run = True
+start = ((1, 0),)
+while run:
+    navigate_user(start)
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            run = False
+            pygame.quit()
