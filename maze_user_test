@@ -12,10 +12,49 @@ wall_image = pygame.image.load('pygame2.jpg')
 square_image = pygame.image.load('white_square.jpg')
 empty_image = pygame.image.load('black_square.jpg')
 dot_image = pygame.image.load('dot.jpg')
-user_image = pygame.image.load('blue_square.jpg')
+user_image = pygame.image.load('white_square.jpg')
 clock = pygame.time.Clock()  # To set the frame rate
 SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
+
+def move_right(cur, path, maze, item):
+    direction = (cur[0] + 1, cur[1])
+    new_path = path + (direction,)
+    navigate_user(new_path)
+    maze[item[0]][item[1]] = '2'
+    create(maze, path)
+    time.sleep(0.3)
+    pygame.display.update()
+
+
+def move_left(cur, path, maze, item):
+    direction = (cur[0] - 1, cur[1])
+    new_path = path + (direction,)
+    navigate_user(new_path)
+    maze[item[0]][item[1]] = '2'
+    create(maze, path)
+    time.sleep(0.3)
+    pygame.display.update()
+
+
+def move_up(cur, path, maze, item):
+    direction = (cur[0], cur[1] + 1)
+    new_path = path + (direction,)
+    navigate_user(new_path)
+    maze[item[0]][item[1]] = '2'
+    create(maze, path)
+    time.sleep(0.3)
+    pygame.display.update()
+
+
+def move_down(cur, path, maze, item):
+    direction = (cur[0], cur[1] - 1)
+    new_path = path + (direction,)
+    navigate_user(new_path)
+    maze[item[0]][item[1]] = '2'
+    create(maze, path)
+    time.sleep(0.3)
+    pygame.display.update()
 
 
 def navigate_user(path):
@@ -24,41 +63,7 @@ def navigate_user(path):
     cur = path[-1]
     create(maze, path)
     poss = [(cur[0], cur[1] + 1), (cur[0], cur[1] - 1), (cur[0] + 1, cur[1]), (cur[0] - 1, cur[1])]
-    def move_right():
-        direction = (cur[0] + 1, cur[1])
-        new_path = path + (direction,)
-        navigate_user(new_path)
-        maze[item[0]][item[1]] = '2'
-        create(maze, path)
-        time.sleep(0.3)
-        pygame.display.update()
 
-    def move_left():
-        direction = (cur[0] - 1, cur[1])
-        new_path = path + (direction,)
-        navigate_user(new_path)
-        maze[item[0]][item[1]] = '2'
-        create(maze, path)
-        time.sleep(0.3)
-        pygame.display.update()
-
-    def move_up():
-        direction = (cur[0], cur[1] + 1)
-        new_path = path + (direction,)
-        navigate_user(new_path)
-        maze[item[0]][item[1]] = '2'
-        create(maze, path)
-        time.sleep(0.3)
-        pygame.display.update()
-
-    def move_down():
-        direction = (cur[0], cur[1] - 1)
-        new_path = path + (direction,)
-        navigate_user(new_path)
-        maze[item[0]][item[1]] = '2'
-        create(maze, path)
-        time.sleep(0.3)
-        pygame.display.update()
     for item in poss:
         if item[0] < 0 or item[1] < 0 or item[0] > len(maze) or item[1] > len(maze[0]):
             continue
@@ -73,16 +78,16 @@ def navigate_user(path):
             create(maze, path)
             input('Solution Found')
             sys.exit()
-        else:
-            key = pygame.key.get_pressed()
-            if key[pygame.K_w]:
-                move_up()
-            if key[pygame.K_s]:
-                move_down()
-            if key[pygame.K_a]:
-                move_left()
-            if key[pygame.K_d]:
-                move_right()
+
+        key = pygame.key.get_pressed()
+        if key[pygame.K_w]:
+            move_up(cur, path, maze, item)
+        if key[pygame.K_s]:
+            move_down(cur, path, maze, item)
+        if key[pygame.K_a]:
+            move_left(cur, path, maze, item)
+        if key[pygame.K_d]:
+            move_right(cur, path, maze, item)
 
 
 def create(_maze, path):
@@ -121,6 +126,7 @@ def get_maze(file):
     for line in reader:
         maze.append(line)
     return maze
+
 
 maze = get_maze('maze.csv')
 run = True
